@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Checkout · Post-to-Order Campaign</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Caveat:wght@700&display=swap" rel="stylesheet">
+<style>
+/*
+VOICE: calm, clear, trustworthy; a receipt you can follow step by step.
+IDEA: an order ticket that moves from "details" to "pay" to "sent".
+PICTURE: the summary ticket (package, amount) and the QR panel.
+COLOUR and TYPE: brand INK/teal, orange only on the main action; Bricolage, Plus Jakarta, Caveat accent.
+LAYOUT: summary left, steps right; stacks on phones with the amount always visible.
+*/
+:root{color-scheme:dark;--night:#0A141B;--ink:#12202B;--ink2:#172A37;--teal:#0F5C63;--teal2:#14767E;--tealtx:#7CC8CD;
+  --orange:#F26A21;--orange2:#FF8A4C;--paper:#F4F7F8;--border:#D9E2E5;--muted:#5B6B73;--txt:#EAF1F3;--txt2:#A9BBC2;--line:rgba(217,226,229,.14);
+  --ok:#1E8E5A;--warn:#C98A0B;--fd:"Bricolage Grotesque",Arial,sans-serif;--fb:"Plus Jakarta Sans",Arial,sans-serif;--fh:"Caveat",cursive}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:radial-gradient(50% 40% at 85% 0%,rgba(20,118,126,.45),transparent 70%),radial-gradient(40% 40% at 0% 100%,rgba(242,106,33,.16),transparent 70%),var(--night);
+  color:var(--txt);font:16px/1.55 var(--fb);min-height:100vh;overflow-x:clip;-webkit-font-smoothing:antialiased}
+a{color:var(--tealtx)}
+.wrap{max-width:1120px;margin:0 auto;padding:0 max(5vw,16px)}
+header{display:flex;justify-content:space-between;align-items:center;height:72px}
+.mark{font:800 18px var(--fd);color:var(--txt);text-decoration:none;display:flex;gap:10px;align-items:center;white-space:nowrap}
+.mark b{display:grid;place-items:center;width:30px;height:30px;border-radius:8px;background:var(--orange);color:var(--ink);font-size:14px}
+.secure{font-size:13px;color:var(--txt2);display:flex;gap:6px;align-items:center}
+h1{font:800 clamp(32px,4.4vw,50px)/1.04 var(--fd);letter-spacing:-.02em;margin:18px 0 6px;text-wrap:balance}
+.hand{font:700 clamp(24px,2.6vw,30px)/1 var(--fh);color:var(--orange2);display:inline-block;transform:rotate(-2deg)}
+.lede{color:var(--txt2);max-width:62ch;margin:10px 0 0}
+.grid{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:clamp(20px,3vw,36px);margin:32px 0 60px;align-items:start}
+@media(max-width:860px){.grid{grid-template-columns:1fr}}
+
+/* summary ticket */
+.ticket{position:sticky;top:20px;background:var(--paper);color:var(--ink);border-radius:20px;padding:24px;box-shadow:0 40px 80px -40px rgba(0,0,0,.8)}
+@media(max-width:860px){.ticket{position:static}}
+.ticket h2{font:800 15px var(--fd);letter-spacing:.02em;color:var(--teal);margin:0 0 12px}
+.pk{display:grid;gap:8px}
+.pk label{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;padding:12px 14px;border:1.5px solid var(--border);border-radius:12px;background:#fff;cursor:pointer;transition:border-color .2s,box-shadow .2s}
+.pk label:hover{border-color:#9FC3C7}
+.pk input{width:18px;height:18px;accent-color:var(--teal);margin:0;color-scheme:light}
+.pk b{font:700 15px var(--fd);display:block}.pk small{display:block;font-size:12.5px;color:var(--muted);line-height:1.35}
+.pk .amt{font:800 15px var(--fd);white-space:nowrap;text-align:right}
+.pk .amt small{font:600 11px var(--fb);color:var(--muted)}
+.pk label:has(input:checked){border-color:var(--teal);box-shadow:0 0 0 3px rgba(15,92,99,.14)}
+.total{margin-top:18px;padding-top:16px;border-top:1.5px dashed var(--border);display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.total span{font-size:14px;color:var(--muted)}
+.total strong{font:800 clamp(30px,3.6vw,38px)/1 var(--fd);letter-spacing:-.02em;white-space:nowrap}
+.note{margin-top:12px;font-size:13px;color:var(--muted);line-height:1.45}
+.note.trial{background:#FFF4EC;border:1px solid #F7C9A9;color:#7A3A12;border-radius:10px;padding:10px 12px}
+.inc{list-style:none;margin:14px 0 0;padding:0;display:grid;gap:6px;font-size:14px}
+.inc li{display:flex;gap:8px}.inc svg{flex:none;margin-top:3px;color:var(--teal)}
+
+/* steps panel */
+.panel{background:rgba(23,42,55,.8);border:1px solid var(--line);border-radius:20px;padding:clamp(20px,3vw,32px);backdrop-filter:blur(8px)}
+.steps{display:flex;gap:8px;margin-bottom:22px;flex-wrap:wrap}
+.steps span{font-size:13px;font-weight:700;color:var(--txt2);padding:6px 12px;border-radius:99px;border:1px solid var(--line);display:flex;gap:8px;align-items:center}
+.steps span i{font-style:normal;width:20px;height:20px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.08);font-size:11px}
+.steps span.on{color:var(--ink);background:var(--orange);border-color:var(--orange)}
+.steps span.on i{background:rgba(18,32,43,.2)}
+.steps span.done{color:var(--tealtx);border-color:rgba(124,200,205,.4)}
+h3{font:800 22px var(--fd);margin:0 0 14px}
+.f{display:grid;gap:6px;margin-bottom:14px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:520px){.two{grid-template-columns:1fr}}
+label.l{font-size:14px;font-weight:700}
+.req{color:var(--orange2)}
+input[type=text],input[type=email]{width:100%;min-height:48px;padding:11px 14px;border-radius:10px;border:1.5px solid rgba(217,226,229,.22);background:rgba(10,20,27,.6);color:var(--txt);font:500 16px var(--fb)}
+input:focus{outline:none;border-color:var(--tealtx);box-shadow:0 0 0 4px rgba(124,200,205,.15)}
+.invalid{border-color:#E2584A!important}
+.methods{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:6px 0 18px}
+@media(max-width:520px){.methods{grid-template-columns:1fr}}
+.m{position:relative;cursor:pointer}
+.m input{position:absolute;opacity:0;width:1px;height:1px}
+.m span{display:grid;gap:4px;padding:14px;border-radius:12px;border:1.5px solid rgba(217,226,229,.22);background:rgba(10,20,27,.45);min-height:84px;transition:all .2s}
+.m b{font:700 15px var(--fd)}.m small{font-size:12.5px;color:var(--txt2);line-height:1.35}
+.m input:checked+span{border-color:var(--orange);background:rgba(242,106,33,.12)}
+.m input:focus-visible+span{outline:3px solid var(--orange2);outline-offset:2px}
+.m.off{cursor:not-allowed}.m.off span{opacity:.5}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;width:100%;min-height:56px;padding:0 22px;border:0;border-radius:12px;cursor:pointer;
+  font:800 17px var(--fb);color:var(--ink);background:var(--orange);text-decoration:none;box-shadow:0 12px 30px -10px rgba(242,106,33,.6);transition:transform .2s,background .2s}
+.btn:hover{transform:translateY(-2px);background:var(--orange2)}
+.btn[disabled]{opacity:.6;cursor:wait;transform:none}
+.btn.ghost{background:transparent;color:var(--txt);box-shadow:inset 0 0 0 1.5px var(--line);font-weight:700}
+:focus-visible{outline:3px solid var(--orange2);outline-offset:3px}
+.err{display:none;margin-top:12px;padding:11px 14px;border-radius:10px;background:rgba(226,88,74,.12);border:1px solid rgba(226,88,74,.4);color:#FFB4AA;font-size:14.5px;font-weight:600}
+.err.show{display:block}
+.fine{font-size:13px;color:var(--txt2);text-align:center;margin-top:12px}
+.hide{display:none!important}
+
+/* pay step */
+.order{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center;justify-content:space-between;padding:14px 16px;border-radius:12px;background:rgba(10,20,27,.55);border:1px solid var(--line);margin-bottom:16px}
+.order .big{font:800 30px/1 var(--fd);white-space:nowrap}
+.order small{display:block;color:var(--txt2);font-size:12.5px}
+.copy{border:1px solid var(--line);background:transparent;color:var(--tealtx);font:700 12.5px var(--fb);border-radius:8px;padding:6px 10px;cursor:pointer;min-height:34px}
+.qrwrap{display:grid;grid-template-columns:minmax(0,220px) minmax(0,1fr);gap:20px;align-items:start;margin-bottom:18px}
+@media(max-width:560px){.qrwrap{grid-template-columns:1fr;justify-items:center}}
+.qr{width:100%;max-width:240px;aspect-ratio:1;background:#fff;border-radius:16px;padding:12px;display:grid;place-items:center;box-shadow:0 20px 40px -20px rgba(0,0,0,.7)}
+.qr img{width:100%;height:100%;object-fit:contain}
+.qr .ph{color:var(--muted);font-size:13px;text-align:center;padding:10px}
+.howto{margin:0;padding:0;list-style:none;counter-reset:s;display:grid;gap:10px}
+.howto li{display:grid;grid-template-columns:auto 1fr;gap:10px;font-size:14.5px;color:var(--txt)}
+.howto li::before{counter-increment:s;content:counter(s);width:24px;height:24px;border-radius:50%;display:grid;place-items:center;background:rgba(124,200,205,.15);color:var(--tealtx);font:800 12px var(--fd)}
+.acct{font-size:13.5px;color:var(--txt2);margin-top:4px}
+.warn{background:rgba(201,138,11,.12);border:1px solid rgba(201,138,11,.45);color:#F2D08B;border-radius:10px;padding:10px 12px;font-size:13.5px;margin-bottom:14px}
+.done{text-align:center;padding:14px 4px}
+.done .ok{width:72px;height:72px;margin:0 auto 16px;border-radius:50%;display:grid;place-items:center;background:rgba(30,142,90,.16);color:#5FD39A}
+.done h3{font-size:28px}
+.done p{color:var(--txt2);max-width:46ch;margin:0 auto 10px}
+.status{display:inline-flex;gap:8px;align-items:center;font-size:13px;font-weight:700;padding:6px 12px;border-radius:99px;background:rgba(201,138,11,.15);color:#F2D08B;margin-bottom:14px}
+.hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+footer{border-top:1px solid var(--line);padding:26px 0 40px;color:var(--txt2);font-size:13.5px}
+footer .wrap{display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between}
+.fade{animation:fade .45s both}@keyframes fade{from{opacity:0;transform:translateY(10px)}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<header class="wrap">
+  <a class="mark" href="./"><b>P</b>Post-to-Order Campaign</a>
+  <span class="secure"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>Checkout</span>
+</header>
+
+<main class="wrap">
+  <span class="hand">ready na ang brief mo?</span>
+  <h1>Checkout</h1>
+  <p class="lede">Choose your package, pay by GCash or bank QR, and send your reference number. I'll confirm your payment by email, then start your project.</p>
+
+  <div class="grid">
+    <!-- SUMMARY -->
+    <aside class="ticket" aria-label="Order summary">
+      <h2>YOUR PACKAGE</h2>
+      <div class="pk" id="pkList" role="radiogroup" aria-label="Package"></div>
+      <ul class="inc" id="incList"></ul>
+      <div class="total"><span>Total to pay</span><strong id="totalAmt">PHP —</strong></div>
+      <p class="note trial hide" id="trialNote">Monthly plans start with a 7-day free trial. Only pay here if you're continuing after your free first week.</p>
+      <p class="note" id="estNote">Prices are in PHP. The amount on your order is final once you continue to payment.</p>
+    </aside>
+
+    <!-- STEPS -->
+    <section class="panel" aria-live="polite">
+      <div class="steps" aria-hidden="true">
+        <span id="s1" class="on"><i>1</i>Details</span><span id="s2"><i>2</i>Pay</span><span id="s3"><i>3</i>Confirm</span>
+      </div>
+
+      <!-- Step 1 -->
+      <form id="step1" novalidate>
+        <h3>Your details</h3>
+        <div class="two">
+          <div class="f"><label class="l" for="name">Name <span class="req">*</span></label><input id="name" type="text" autocomplete="name" maxlength="80" required></div>
+          <div class="f"><label class="l" for="email">Email <span class="req">*</span></label><input id="email" type="email" autocomplete="email" maxlength="120" required></div>
+          <div class="f"><label class="l" for="shop">Shop or brand</label><input id="shop" type="text" maxlength="100"></div>
+          <div class="f"><label class="l" for="mobile">Mobile or Messenger</label><input id="mobile" type="text" maxlength="80"></div>
+        </div>
+        <div class="f"><span class="l">Payment method <span class="req">*</span></span>
+          <div class="methods" role="radiogroup" aria-label="Payment method">
+            <label class="m"><input type="radio" name="method" value="GCASH_QR" checked><span><b>GCash QR</b><small>Scan with your GCash app</small></span></label>
+            <label class="m"><input type="radio" name="method" value="BANK_QR"><span><b>Bank / QR Ph</b><small>UnionBank QR, scan with any bank or Maya app</small></span></label>
+            <label class="m" id="cardOpt"><input type="radio" name="method" value="CARD"><span><b>Card</b><small id="cardSub">Credit or debit card</small></span></label>
+          </div>
+        </div>
+        <div class="hp" aria-hidden="true"><label for="website">Website</label><input id="website" type="text" tabindex="-1" autocomplete="off"></div>
+        <div id="ts"></div>
+        <button class="btn" type="submit" id="go1">Continue to payment <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+        <div class="err" id="err1" role="alert"></div>
+        <p class="fine">Your card details are never entered on this page. No sales, orders or income are promised.</p>
+      </form>
+
+      <!-- Step 2: QR -->
+      <form id="step2qr" class="hide fade" novalidate>
+        <h3>Scan and pay</h3>
+        <div class="order">
+          <div><small>Pay exactly</small><span class="big" id="payAmt">PHP —</span></div>
+          <div><small>Order</small><b id="payId">—</b></div>
+          <button type="button" class="copy" id="copyAmt">Copy amount</button>
+        </div>
+        <div class="warn hide" id="qrMissing">The QR code for this method hasn't been added yet. Please choose another method or email me.</div>
+        <div class="qrwrap">
+          <div class="qr" id="qrBox"></div>
+          <div>
+            <ol class="howto">
+              <li><span id="howApp">Open GCash and tap <b>Scan QR</b>.</span></li>
+              <li><span>Pay the exact amount above. Add your order number in the note if your app allows it.</span></li>
+              <li><span>Copy the reference number from your receipt and paste it below.</span></li>
+            </ol>
+            <p class="acct" id="acctInfo"></p>
+          </div>
+        </div>
+        <div class="two">
+          <div class="f"><label class="l" for="ref">Reference number <span class="req">*</span></label><input id="ref" type="text" inputmode="text" maxlength="40" autocomplete="off" placeholder="e.g. 1234 567 890123" required></div>
+          <div class="f"><label class="l" for="sender">Name on the account you paid from</label><input id="sender" type="text" maxlength="80"></div>
+        </div>
+        <button class="btn" type="submit" id="go2">I've paid, send my reference</button>
+        <div class="err" id="err2" role="alert"></div>
+        <p class="fine">Sending a reference doesn't mark your order as paid. I check the actual payment first.</p>
+      </form>
+
+      <!-- Step 2: Card -->
+      <div id="step2card" class="hide fade">
+        <h3>Pay by card</h3>
+        <div class="order">
+          <div><small>Amount</small><span class="big" id="cardAmt">PHP —</span></div>
+          <div><small>Order</small><b id="cardId">—</b></div>
+        </div>
+        <p class="lede" style="margin:0 0 18px">You'll go to the secure payment page of my card provider. Enter your card there, never on this page. Use the same email as above so I can match your payment.</p>
+        <a class="btn" id="cardLink" href="#" rel="noopener">Pay by card</a>
+        <p class="fine">After paying, you'll get an email once I confirm your order.</p>
+      </div>
+
+      <!-- Step 3 -->
+      <div id="step3" class="hide fade done">
+        <div class="ok"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg></div>
+        <span class="status">Status: payment submitted, waiting for confirmation</span>
+        <h3>Salamat! Reference received.</h3>
+        <p>I'll check that the payment arrived. You'll get an email when your order <b id="doneId"></b> is confirmed, usually within 1 business day.</p>
+        <p>Check your inbox (and Spam) for a copy of your reference.</p>
+      </div>
+    </section>
+  </div>
+</main>
+
+<footer><div class="wrap"><span>Post-to-Order Campaign · Done-for-You AI Product Creative Packages by Cris Ignacio</span><span>Questions? Email crisignaciodesigndev@gmail.com</span></div></footer>
+
+<script>
+{
+/* ================== CONFIG ================== */
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwgqXbm9qxTf8jdZIYDxK6L-Uudif7rXAKFUMGZRoWDYPIHAAfN88FbL8UVpbGGrPoi/exec";
+const TURNSTILE_SITE_KEY = "";   // same as the landing page; leave "" to turn off
+// Put your QR images next to this file (same GitHub repo), with these exact names:
+const QR = {
+  GCASH_QR: { img: "qr-gcash.png", app: "Open GCash and tap <b>Scan QR</b>.", account: "GCash · CR*****O I. · +63 965 211 ••••" },
+  BANK_QR:  { img: "qr-bank.png",  app: "Open your bank or Maya app and choose <b>Scan QR / QR Ph</b> (InstaPay).", account: "UnionBank · CRIS · **** **** 9803" }
+};
+/* ============================================ */
+
+const PKGS = [
+  { n: "Starter", d: "10 AI product photo creatives", php: 6500, inc: ["10 AI product photo creatives", "Short creative brief", "1 revision round", "Delivered in 14 days"] },
+  { n: "Growth", d: "10 photo creatives + 2 short videos", php: 11000, inc: ["10 AI product photo creatives", "2 AI short product videos (9:16)", "Short creative brief", "1 revision round", "Delivered in 14 days"] },
+  { n: "Complete", d: "Photos + videos + landing page", php: 17500, inc: ["10 AI product photo creatives", "2 AI short product videos (9:16)", "1 landing page for up to 3 products", "Short creative brief", "1 revision round", "Delivered in 14 days"] },
+  { n: "Monthly Lite", d: "USD 250 / month", php: 14500, monthly: 1, inc: ["10 AI creative images per month", "5 custom product AI videos per month", "1 revision round per month", "Weekly batches"] },
+  { n: "Monthly Full", d: "USD 500 / month", php: 29000, monthly: 1, inc: ["20 AI creative images per month", "10 custom product AI videos per month", "1 revision round per month", "Weekly batches"] }
+];
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const peso = n => "PHP " + Number(n).toLocaleString("en-US");
+const ck = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg>';
+let cardEnabled = {}; let order = null; let tsToken = "";
+
+/* packages */
+const wanted = (new URLSearchParams(location.search).get("package") || "").toLowerCase();
+const start = Math.max(0, PKGS.findIndex(p => p.n.toLowerCase() === wanted));
+$("pkList").innerHTML = PKGS.map((p, i) => `<label><input type="radio" name="pkg" value="${esc(p.n)}"${i === start ? " checked" : ""}>
+  <span><b>${esc(p.n)}</b><small>${esc(p.d)}</small></span><span class="amt" data-amt="${esc(p.n)}">${peso(p.php)}${p.monthly ? "<small> / mo</small>" : ""}</span></label>`).join("");
+const pkgNow = () => PKGS.find(p => p.n === document.querySelector("input[name=pkg]:checked").value);
+function renderSummary() {
+  const p = pkgNow();
+  $("incList").innerHTML = p.inc.map(x => `<li>${ck}<span>${esc(x)}</span></li>`).join("");
+  $("totalAmt").textContent = peso(p.php);
+  $("trialNote").classList.toggle("hide", !p.monthly);
+  syncCard();
+}
+function syncCard() {
+  const on = !!cardEnabled[pkgNow().n];
+  const opt = $("cardOpt"), inp = opt.querySelector("input");
+  opt.classList.toggle("off", !on); inp.disabled = !on;
+  $("cardSub").textContent = on ? "Credit or debit card" : "Coming soon";
+  if (!on && inp.checked) document.querySelector("input[name=method][value=GCASH_QR]").checked = true;
+}
+$("pkList").addEventListener("change", renderSummary);
+renderSummary();
+
+/* live prices + card availability from the Sheet (falls back to the list above) */
+(async () => {
+  try {
+    const r = await fetch(APPS_SCRIPT_URL + "?action=config");
+    const c = await r.json();
+    if (!c.ok || !c.packages) return;
+    PKGS.forEach(p => {
+      const s = c.packages[p.n]; if (!s) return;
+      if (s.amountPHP) p.php = s.amountPHP;
+      cardEnabled[p.n] = !!s.card;
+      const el = document.querySelector(`[data-amt="${CSS.escape(p.n)}"]`);
+      if (el) el.innerHTML = peso(p.php) + (p.monthly ? "<small> / mo</small>" : "");
+    });
+    renderSummary();
+  } catch (e) { /* offline or preview: keep defaults, card stays "coming soon" */ }
+})();
+
+/* turnstile (optional) */
+if (TURNSTILE_SITE_KEY) {
+  window.onTs = () => window.turnstile.render("#ts", { sitekey: TURNSTILE_SITE_KEY, callback: t => { tsToken = t; }, "expired-callback": () => { tsToken = ""; } });
+  const s = document.createElement("script"); s.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onTs"; s.async = true; document.head.appendChild(s);
+}
+
+async function call(data) {
+  const res = await fetch(APPS_SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(data) });
+  const out = await res.json();
+  if (!out.ok) throw new Error(out.error || "Something went wrong.");
+  return out;
+}
+function showErr(id, msg) { const e = $(id); e.textContent = msg; e.classList.add("show"); }
+function step(n) {
+  ["s1", "s2", "s3"].forEach((s, i) => { $(s).className = i + 1 === n ? "on" : i + 1 < n ? "done" : ""; });
+}
+
+/* step 1 → create order */
+$("step1").addEventListener("submit", async e => {
+  e.preventDefault(); $("err1").classList.remove("show");
+  const name = $("name").value.trim(), email = $("email").value.trim();
+  let bad = null;
+  if (name.length < 2) bad = bad || $("name");
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) bad = bad || $("email");
+  ["name", "email"].forEach(id => $(id).classList.toggle("invalid", $(id) === bad || ($(id) === $("email") && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email))));
+  if (bad) { bad.focus(); showErr("err1", "Please enter your name and a valid email."); return; }
+  if (TURNSTILE_SITE_KEY && !tsToken) { showErr("err1", "Please complete the quick security check."); return; }
+  const method = document.querySelector("input[name=method]:checked").value;
+  const btn = $("go1"); btn.disabled = true;
+  try {
+    order = await call({ action: "createOrder", name, email, shop: $("shop").value.trim(), mobile: $("mobile").value.trim(),
+      package: pkgNow().n, method, website: $("website").value, turnstileToken: tsToken, source: location.hostname || "preview" });
+    order.email = email;
+    $("totalAmt").textContent = peso(order.amountPHP);
+    document.querySelectorAll("#pkList input,#step1 input").forEach(i => i.disabled = true);
+    $("step1").classList.add("hide"); step(2);
+    if (order.method === "CARD") {
+      $("cardAmt").textContent = peso(order.amountPHP); $("cardId").textContent = order.orderId;
+      $("cardLink").href = order.cardLink; $("cardLink").textContent = "Pay " + peso(order.amountPHP) + " by card";
+      $("step2card").classList.remove("hide");
+    } else {
+      const q = QR[order.method];
+      $("payAmt").textContent = peso(order.amountPHP); $("payId").textContent = order.orderId;
+      $("howApp").innerHTML = q.app; $("acctInfo").textContent = q.account ? "Paying to: " + q.account : "";
+      const img = new Image(); img.alt = (order.method === "GCASH_QR" ? "GCash" : "Bank QR Ph") + " QR code for Cris Ignacio";
+      img.onerror = () => { $("qrBox").innerHTML = '<div class="ph">QR image not added yet</div>'; $("qrMissing").classList.remove("hide"); $("go2").disabled = true; };
+      img.src = q.img; $("qrBox").replaceChildren(img);
+      $("step2qr").classList.remove("hide");
+    }
+    $("s2").scrollIntoView({ behavior: "smooth", block: "start" });
+  } catch (err) {
+    showErr("err1", err.message === "Failed to fetch" ? "Hindi ma-connect. Please check your internet and try again." : err.message);
+    btn.disabled = false; window.turnstile && window.turnstile.reset && window.turnstile.reset(); tsToken = "";
+  }
+});
+
+$("copyAmt").addEventListener("click", async () => {
+  try { await navigator.clipboard.writeText(String(order.amountPHP)); $("copyAmt").textContent = "Copied"; }
+  catch (e) { $("copyAmt").textContent = String(order.amountPHP); }
+});
+
+/* step 2 → send reference */
+$("step2qr").addEventListener("submit", async e => {
+  e.preventDefault(); $("err2").classList.remove("show");
+  const ref = $("ref").value.replace(/\s+/g, "");
+  if (!/^[A-Za-z0-9-]{6,40}$/.test(ref)) { $("ref").classList.add("invalid"); $("ref").focus(); showErr("err2", "Please paste the reference number from your receipt (letters and numbers only)."); return; }
+  $("ref").classList.remove("invalid");
+  const btn = $("go2"); btn.disabled = true;
+  try {
+    await call({ action: "submitPaymentReference", orderId: order.orderId, email: order.email, reference: ref, senderName: $("sender").value.trim(), turnstileToken: tsToken });
+    $("step2qr").classList.add("hide"); $("doneId").textContent = order.orderId; $("step3").classList.remove("hide"); step(3);
+  } catch (err) {
+    showErr("err2", err.message === "Failed to fetch" ? "Hindi ma-connect. Please check your internet and try again." : err.message);
+    btn.disabled = false;
+  }
+});
+}
+</script>
+</body>
+</html>
